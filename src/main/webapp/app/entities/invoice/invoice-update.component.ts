@@ -28,7 +28,7 @@ export class InvoiceUpdateComponent implements OnInit {
     paymentMethod: [null, [Validators.required]],
     paymentDate: [null, [Validators.required]],
     paymentAmount: [null, [Validators.required]],
-    order: [],
+    order: [null, Validators.required],
   });
 
   constructor(
