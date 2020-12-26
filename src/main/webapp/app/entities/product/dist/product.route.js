@@ -10,7 +10,6 @@ exports.productRoute = exports.ProductResolve = void 0;
 var core_1 = require("@angular/core");
 var rxjs_1 = require("rxjs");
 var operators_1 = require("rxjs/operators");
-var ng_jhipster_1 = require("ng-jhipster");
 var authority_constants_1 = require("app/shared/constants/authority.constants");
 var user_route_access_service_1 = require("app/core/auth/user-route-access-service");
 var product_model_1 = require("app/shared/model/product.model");
@@ -18,13 +17,23 @@ var product_component_1 = require("./product.component");
 var product_detail_component_1 = require("./product-detail.component");
 var product_update_component_1 = require("./product-update.component");
 var ProductResolve = /** @class */ (function () {
-    function ProductResolve(service) {
+    function ProductResolve(service, router) {
         this.service = service;
+        this.router = router;
     }
     ProductResolve.prototype.resolve = function (route) {
+        var _this = this;
         var id = route.params['id'];
         if (id) {
-            return this.service.find(id).pipe(operators_1.map(function (product) { return product.body || null; }));
+            return this.service.find(id).pipe(operators_1.flatMap(function (product) {
+                if (product.body) {
+                    return rxjs_1.of(product.body);
+                }
+                else {
+                    _this.router.navigate(['404']);
+                    return rxjs_1.EMPTY;
+                }
+            }));
         }
         return rxjs_1.of(new product_model_1.Product());
     };
@@ -38,11 +47,8 @@ exports.productRoute = [
     {
         path: '',
         component: product_component_1.ProductComponent,
-        resolve: {
-            pagingParams: ng_jhipster_1.JhiResolvePagingParams
-        },
         data: {
-            authorities: authority_constants_1.Authority.USER,
+            authorities: [authority_constants_1.Authority.USER],
             defaultSort: 'id,asc',
             pageTitle: 'storeApp.product.home.title'
         },
@@ -55,7 +61,7 @@ exports.productRoute = [
             product: ProductResolve
         },
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: [authority_constants_1.Authority.USER],
             pageTitle: 'storeApp.product.home.title'
         },
         canActivate: [user_route_access_service_1.UserRouteAccessService]
@@ -67,7 +73,7 @@ exports.productRoute = [
             product: ProductResolve
         },
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: [authority_constants_1.Authority.USER],
             pageTitle: 'storeApp.product.home.title'
         },
         canActivate: [user_route_access_service_1.UserRouteAccessService]
@@ -79,7 +85,7 @@ exports.productRoute = [
             product: ProductResolve
         },
         data: {
-            authorities: ['ROLE_USER'],
+            authorities: [authority_constants_1.Authority.USER],
             pageTitle: 'storeApp.product.home.title'
         },
         canActivate: [user_route_access_service_1.UserRouteAccessService]

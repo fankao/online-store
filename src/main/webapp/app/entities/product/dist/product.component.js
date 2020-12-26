@@ -37,7 +37,7 @@ var ProductComponent = /** @class */ (function () {
             size: this.itemsPerPage,
             sort: this.sort()
         })
-            .subscribe(function (res) { return _this.paginateProducts(res.body || [], res.headers); });
+            .subscribe(function (res) { return _this.paginateProducts(res.body, res.headers); });
     };
     ProductComponent.prototype.loadPage = function (page) {
         if (page !== this.previousPage) {
