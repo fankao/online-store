@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { ActivatedRoute, ParamMap, Router, Data } from '@angular/router';
-import { Subscription, combineLatest } from 'rxjs';
-import { JhiEventManager, JhiDataUtils } from 'ng-jhipster';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { JhiEventManager, JhiDataUtils, JhiParseLinks } from 'ng-jhipster';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { IProduct } from 'app/shared/model/product.model';
@@ -17,22 +17,23 @@ import { ProductDeleteDialogComponent } from './product-delete-dialog.component'
 })
 export class ProductComponent implements OnInit, OnDestroy {
   products?: IProduct[];
+  error!: any;
+  success!: any;
   eventSubscriber?: Subscription;
+  routeData!: any;
+  links!: any;
   totalItems = 0;
-  itemsPerPage = ITEMS_PER_PAGE;
+  itemsPerPage!: number;
   page!: number;
-  predicate!: string;
-  ascending!: boolean;
-  ngbPaginationPage = 1;
-  reverse!: any;
-  filter!: string;
-  routeData!: Subscription;
+  predicate!: any;
   previousPage!: any;
-  links: any;
-  parseLinks: any;
+  reverse!: any;
+
+  filter!: string;
 
   constructor(
     protected productService: ProductService,
+    protected parseLinks: JhiParseLinks,
     protected activatedRoute: ActivatedRoute,
     protected dataUtils: JhiDataUtils,
     protected router: Router,
@@ -55,7 +56,7 @@ export class ProductComponent implements OnInit, OnDestroy {
         size: this.itemsPerPage,
         sort: this.sort(),
       })
-      .subscribe((res: HttpResponse<IProduct[]>) => this.paginateProducts(res.body, res.headers));
+      .subscribe((res: HttpResponse<IProduct[]>) => this.paginateProducts(res.body || [], res.headers));
   }
 
   loadPage(page: number): void {
@@ -92,13 +93,6 @@ export class ProductComponent implements OnInit, OnDestroy {
     this.loadAll();
     this.registerChangeInProducts();
   }
-
-  protected paginateProducts(data?: IProduct[] | null, headers: HttpHeaders): void {
-    this.links = this.parseLinks.parse(headers.get('link')!);
-    this.totalItems = Number(headers.get('X-Total-Count'));
-    this.products = data || [];
-  }
-
   ngOnDestroy(): void {
     if (this.eventSubscriber) {
       this.eventManager.destroy(this.eventSubscriber);
@@ -106,7 +100,6 @@ export class ProductComponent implements OnInit, OnDestroy {
   }
 
   trackId(index: number, item: IProduct): number {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     return item.id!;
   }
 
@@ -128,30 +121,16 @@ export class ProductComponent implements OnInit, OnDestroy {
   }
 
   sort(): string[] {
-    const result = [this.predicate + ',' + (this.ascending ? 'asc' : 'desc')];
+    const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
     if (this.predicate !== 'id') {
       result.push('id');
     }
     return result;
   }
 
-  protected onSuccess(data: IProduct[] | null, headers: HttpHeaders, page: number, navigate: boolean): void {
-    this.totalItems = Number(headers.get('X-Total-Count'));
-    this.page = page;
-    if (navigate) {
-      this.router.navigate(['/product'], {
-        queryParams: {
-          page: this.page,
-          size: this.itemsPerPage,
-          sort: this.predicate + ',' + (this.ascending ? 'asc' : 'desc'),
-        },
-      });
-    }
+  protected paginateProducts(data: IProduct[] | null, headers: HttpHeaders): void {
+    this.links = this.parseLinks.parse(headers.get('link') || '');
+    this.totalItems = parseInt(headers.get('X-Total-Count') || '0', 10);
     this.products = data || [];
-    this.ngbPaginationPage = this.page;
-  }
-
-  protected onError(): void {
-    this.ngbPaginationPage = this.page ?? 1;
   }
 }

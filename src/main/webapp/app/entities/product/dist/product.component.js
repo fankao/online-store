@@ -11,17 +11,16 @@ var core_1 = require("@angular/core");
 var pagination_constants_1 = require("app/shared/constants/pagination.constants");
 var product_delete_dialog_component_1 = require("./product-delete-dialog.component");
 var ProductComponent = /** @class */ (function () {
-    function ProductComponent(productService, activatedRoute, dataUtils, router, eventManager, modalService) {
+    function ProductComponent(productService, parseLinks, activatedRoute, dataUtils, router, eventManager, modalService) {
         var _this = this;
         this.productService = productService;
+        this.parseLinks = parseLinks;
         this.activatedRoute = activatedRoute;
         this.dataUtils = dataUtils;
         this.router = router;
         this.eventManager = eventManager;
         this.modalService = modalService;
         this.totalItems = 0;
-        this.itemsPerPage = pagination_constants_1.ITEMS_PER_PAGE;
-        this.ngbPaginationPage = 1;
         this.itemsPerPage = pagination_constants_1.ITEMS_PER_PAGE;
         this.routeData = this.activatedRoute.data.subscribe(function (data) {
             _this.page = data.pagingParams.page;
@@ -38,7 +37,7 @@ var ProductComponent = /** @class */ (function () {
             size: this.itemsPerPage,
             sort: this.sort()
         })
-            .subscribe(function (res) { return _this.paginateProducts(res.body, res.headers); });
+            .subscribe(function (res) { return _this.paginateProducts(res.body || [], res.headers); });
     };
     ProductComponent.prototype.loadPage = function (page) {
         if (page !== this.previousPage) {
@@ -71,18 +70,12 @@ var ProductComponent = /** @class */ (function () {
         this.loadAll();
         this.registerChangeInProducts();
     };
-    ProductComponent.prototype.paginateProducts = function (data, headers) {
-        this.links = this.parseLinks.parse(headers.get('link'));
-        this.totalItems = Number(headers.get('X-Total-Count'));
-        this.products = data || [];
-    };
     ProductComponent.prototype.ngOnDestroy = function () {
         if (this.eventSubscriber) {
             this.eventManager.destroy(this.eventSubscriber);
         }
     };
     ProductComponent.prototype.trackId = function (index, item) {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         return item.id;
     };
     ProductComponent.prototype.byteSize = function (base64String) {
@@ -101,30 +94,16 @@ var ProductComponent = /** @class */ (function () {
         modalRef.componentInstance.product = product;
     };
     ProductComponent.prototype.sort = function () {
-        var result = [this.predicate + ',' + (this.ascending ? 'asc' : 'desc')];
+        var result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
         if (this.predicate !== 'id') {
             result.push('id');
         }
         return result;
     };
-    ProductComponent.prototype.onSuccess = function (data, headers, page, navigate) {
-        this.totalItems = Number(headers.get('X-Total-Count'));
-        this.page = page;
-        if (navigate) {
-            this.router.navigate(['/product'], {
-                queryParams: {
-                    page: this.page,
-                    size: this.itemsPerPage,
-                    sort: this.predicate + ',' + (this.ascending ? 'asc' : 'desc')
-                }
-            });
-        }
+    ProductComponent.prototype.paginateProducts = function (data, headers) {
+        this.links = this.parseLinks.parse(headers.get('link') || '');
+        this.totalItems = parseInt(headers.get('X-Total-Count') || '0', 10);
         this.products = data || [];
-        this.ngbPaginationPage = this.page;
-    };
-    ProductComponent.prototype.onError = function () {
-        var _a;
-        this.ngbPaginationPage = (_a = this.page) !== null && _a !== void 0 ? _a : 1;
     };
     ProductComponent = __decorate([
         core_1.Component({

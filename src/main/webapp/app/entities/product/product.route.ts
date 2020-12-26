@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { Resolve, ActivatedRouteSnapshot, Routes, Router } from '@angular/router';
-import { Observable, of, EMPTY } from 'rxjs';
-import { flatMap } from 'rxjs/operators';
-
+import { Resolve, ActivatedRouteSnapshot, Routes } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { JhiResolvePagingParams } from 'ng-jhipster';
 import { Authority } from 'app/shared/constants/authority.constants';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access-service';
 import { IProduct, Product } from 'app/shared/model/product.model';
@@ -14,21 +14,12 @@ import { ProductUpdateComponent } from './product-update.component';
 
 @Injectable({ providedIn: 'root' })
 export class ProductResolve implements Resolve<IProduct> {
-  constructor(private service: ProductService, private router: Router) {}
+  constructor(private service: ProductService) {}
 
-  resolve(route: ActivatedRouteSnapshot): Observable<IProduct> | Observable<never> {
+  resolve(route: ActivatedRouteSnapshot): Observable<IProduct> {
     const id = route.params['id'];
     if (id) {
-      return this.service.find(id).pipe(
-        flatMap((product: HttpResponse<Product>) => {
-          if (product.body) {
-            return of(product.body);
-          } else {
-            this.router.navigate(['404']);
-            return EMPTY;
-          }
-        })
-      );
+      return this.service.find(id).pipe(map((product: HttpResponse<Product>) => product.body || null));
     }
     return of(new Product());
   }
@@ -38,8 +29,11 @@ export const productRoute: Routes = [
   {
     path: '',
     component: ProductComponent,
+    resolve: {
+      pagingParams: JhiResolvePagingParams,
+    },
     data: {
-      authorities: [Authority.USER],
+      authorities: Authority.USER,
       defaultSort: 'id,asc',
       pageTitle: 'storeApp.product.home.title',
     },
@@ -52,7 +46,7 @@ export const productRoute: Routes = [
       product: ProductResolve,
     },
     data: {
-      authorities: [Authority.USER],
+      authorities: ['ROLE_USER'],
       pageTitle: 'storeApp.product.home.title',
     },
     canActivate: [UserRouteAccessService],
@@ -64,7 +58,7 @@ export const productRoute: Routes = [
       product: ProductResolve,
     },
     data: {
-      authorities: [Authority.USER],
+      authorities: ['ROLE_USER'],
       pageTitle: 'storeApp.product.home.title',
     },
     canActivate: [UserRouteAccessService],
@@ -76,7 +70,7 @@ export const productRoute: Routes = [
       product: ProductResolve,
     },
     data: {
-      authorities: [Authority.USER],
+      authorities: ['ROLE_USER'],
       pageTitle: 'storeApp.product.home.title',
     },
     canActivate: [UserRouteAccessService],
