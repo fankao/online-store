@@ -14,6 +14,7 @@ export interface IInvoice {
   paymentAmount?: number;
   shipments?: IShipment[];
   order?: IProductOrder;
+  code?: String;
 }
 
 export class Invoice implements IInvoice {
@@ -26,6 +27,7 @@ export class Invoice implements IInvoice {
     public paymentDate?: Moment,
     public paymentAmount?: number,
     public shipments?: IShipment[],
-    public order?: IProductOrder
+    public order?: IProductOrder,
+    public code?: String
   ) {}
 }

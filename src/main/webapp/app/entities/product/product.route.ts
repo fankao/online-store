@@ -19,7 +19,7 @@ export class ProductResolve implements Resolve<IProduct> {
   resolve(route: ActivatedRouteSnapshot): Observable<IProduct> {
     const id = route.params['id'];
     if (id) {
-      return this.service.find(id).pipe(map((product: HttpResponse<Product>) => product.body || null));
+      return this.service.find(id).pipe(map((product: HttpResponse<Product> | HttpResponse<any>) => product.body));
     }
     return of(new Product());
   }
