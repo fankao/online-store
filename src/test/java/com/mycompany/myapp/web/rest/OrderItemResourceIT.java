@@ -31,7 +31,8 @@ import com.mycompany.myapp.domain.enumeration.OrderItemStatus;
  */
 @SpringBootTest(classes = StoreApp.class)
 @AutoConfigureMockMvc
-@WithMockUser
+@WithMockUser(username="admin", authorities={"ROLE_ADMIN"},
+    password = "admin")
 public class OrderItemResourceIT {
 
     private static final Integer DEFAULT_QUANTITY = 0;
@@ -240,7 +241,7 @@ public class OrderItemResourceIT {
             .andExpect(jsonPath("$.[*].totalPrice").value(hasItem(DEFAULT_TOTAL_PRICE.intValue())))
             .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())));
     }
-    
+
     @Test
     @Transactional
     public void getOrderItem() throws Exception {

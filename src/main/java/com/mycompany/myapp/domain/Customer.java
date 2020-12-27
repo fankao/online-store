@@ -24,6 +24,7 @@ public class Customer implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(updatable = false,unique = true,nullable = false)
     private Long id;
 
     @NotNull

@@ -31,6 +31,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false,unique = true,updatable = false)
     private Long id;
 
     @NotNull

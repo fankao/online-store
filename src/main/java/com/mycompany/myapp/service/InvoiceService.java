@@ -74,7 +74,7 @@ public class InvoiceService {
             return invoiceRepository.findById(id);
         } else
             return invoiceRepository.
-                findOneByIdAndCustomerUserLogin(
+                findOneByIdAndOrderCustomerUserLogin(
                     id,
                     SecurityUtils.getCurrentUserLogin().get()
                 );
