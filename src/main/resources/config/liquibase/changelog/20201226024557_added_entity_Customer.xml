@@ -44,9 +44,9 @@
                 <constraints nullable="false" />
             </column>
             <column name="user_id" type="bigint">
-                <constraints unique="true" nullable="false" uniqueConstraintName="ux_customer_user_id" />
+                <constraints  nullable="false" uniqueConstraintName="ux_customer_user_id" />
             </column>
-            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->
         </createTable>
     </changeSet>
 
@@ -65,9 +65,9 @@
     -->
     <changeSet id="20201226024557-1-data" author="jhipster" context="faker">
         <loadData
-                  file="config/liquibase/fake-data/customer.csv"
-                  separator=";"
-                  tableName="customer">
+            file="config/liquibase/fake-data/customer.csv"
+            separator=";"
+            tableName="customer">
             <column name="id" type="numeric"/>
             <column name="first_name" type="string"/>
             <column name="last_name" type="string"/>
@@ -79,7 +79,7 @@
             <column name="city" type="string"/>
             <column name="country" type="string"/>
             <column name="user_id" type="numeric"/>
-            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here, do not remove-->
         </loadData>
     </changeSet>
 
