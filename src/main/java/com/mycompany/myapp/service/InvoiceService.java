@@ -2,6 +2,8 @@ package com.mycompany.myapp.service;
 
 import com.mycompany.myapp.domain.Invoice;
 import com.mycompany.myapp.repository.InvoiceRepository;
+import com.mycompany.myapp.security.AuthoritiesConstants;
+import com.mycompany.myapp.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +49,14 @@ public class InvoiceService {
     @Transactional(readOnly = true)
     public Page<Invoice> findAll(Pageable pageable) {
         log.debug("Request to get all Invoices");
-        return invoiceRepository.findAll(pageable);
+        if (SecurityUtils.isCurrentUserInRole
+            (AuthoritiesConstants.ADMIN)) {
+            return invoiceRepository.findAll(pageable);
+        } else
+            return invoiceRepository.findAllByOrderCustomerUserLogin(
+                SecurityUtils.getCurrentUserLogin().get(),
+                pageable
+            );
     }
 
 
@@ -60,7 +69,15 @@ public class InvoiceService {
     @Transactional(readOnly = true)
     public Optional<Invoice> findOne(Long id) {
         log.debug("Request to get Invoice : {}", id);
-        return invoiceRepository.findById(id);
+        if (SecurityUtils.isCurrentUserInRole
+            (AuthoritiesConstants.ADMIN)) {
+            return invoiceRepository.findById(id);
+        } else
+            return invoiceRepository.
+                findOneByIdAndCustomerUserLogin(
+                    id,
+                    SecurityUtils.getCurrentUserLogin().get()
+                );
     }
 
     /**
