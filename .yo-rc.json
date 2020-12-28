@@ -41,7 +41,10 @@
     "blueprints": [],
     "skipUserManagement": false,
     "skipClient": false,
-    "skipServer": false
+    "skipServer": false,
+    "herokuAppName": "online-store-monolith",
+    "herokuDeployType": "git",
+    "herokuJavaVersion": "1.8"
   },
   "entities": ["Customer", "Invoice", "OrderItem", "Product", "ProductCategory", "ProductOrder", "Shipment"]
 }
